@@ -41,7 +41,7 @@ def make_extensions():
     return extensions
 
 setup(
-    name                 = 'biosaur2',
+    name                 = 'biosaur2_dev',
     version              = version,
     description          = '''A feature detection LC-MS1 spectra.''',
     long_description     = (''.join(open('README.md', encoding="utf8").readlines())),

@@ -67,24 +67,26 @@ def calc_peptide_features(hills_dict, peptide_features, negative_mode, faims_val
         pep_feature['massCalib'] = pep_feature['mz'] * pep_feature['charge'] - 1.0072765 * pep_feature['charge'] * (-1 if negative_mode else 1)
 
         hills_dict, _, _ = get_and_calc_apex_intensity_and_scan(hills_dict, pep_feature['monoisotope idx'])
-        pep_feature['intensityApex'] = hills_dict['hills_intensity_apex'][pep_feature['monoisotope idx']]
-        pep_feature['intensitySum'] = sum(hills_dict['hills_intensity_array'][pep_feature['monoisotope idx']])
+        # pep_feature['intensityApex'] = hills_dict['hills_intensity_apex'][pep_feature['monoisotope idx']]
+        # pep_feature['intensitySum'] = sum(hills_dict['hills_intensity_array'][pep_feature['monoisotope idx']])
 
-        if isotopes_for_intensity != 0:
-            idx_cur = 0
-            for cand in pep_feature['isotopes']:
-                idx_cur += 1
-                if idx_cur == isotopes_for_intensity + 1:
-                    break
-                else:
-                    iso_idx = cand['isotope_idx']
-                    hills_dict, _, _ = get_and_calc_apex_intensity_and_scan(hills_dict, iso_idx)
-                    pep_feature['intensityApex'] += hills_dict['hills_intensity_apex'][iso_idx]
-                    pep_feature['intensitySum'] += sum(hills_dict['hills_intensity_array'][iso_idx])
+        # if isotopes_for_intensity != 0:
+        #     idx_cur = 0
+        #     for cand in pep_feature['isotopes']:
+        #         idx_cur += 1
+        #         if idx_cur == isotopes_for_intensity + 1:
+        #             break
+        #         else:
+        #             iso_idx = cand['isotope_idx']
+        #             hills_dict, _, _ = get_and_calc_apex_intensity_and_scan(hills_dict, iso_idx)
+        #             pep_feature['intensityApex'] += hills_dict['hills_intensity_apex'][iso_idx]
+        #             pep_feature['intensitySum'] += sum(hills_dict['hills_intensity_array'][iso_idx])
                 
 
         pep_feature['scanApex'] = hills_dict['hills_scan_apex'][pep_feature['monoisotope idx']]
         pep_feature['rtApex'] = RT_dict[hills_dict['hills_scan_apex'][pep_feature['monoisotope idx']]+data_start_id]
+        pep_feature['intensityApex'] = hills_dict['hills_intensity_apex'][pep_feature['monoisotope idx']]
+        pep_feature['intensitySum'] = sum(hills_dict['hills_intensity_array'][pep_feature['monoisotope idx']])
         pep_feature['rtStart'] = RT_dict[hills_dict['hills_scan_lists'][pep_feature['monoisotope idx']][0]+data_start_id]
         pep_feature['rtEnd'] = RT_dict[hills_dict['hills_scan_lists'][pep_feature['monoisotope idx']][-1]+data_start_id]
         pep_feature['mono_hills_scan_lists'] = hills_dict['hills_scan_lists'][pep_feature['monoisotope idx']]
@@ -402,6 +404,8 @@ def process_mzml(args):
     min_intensity = args['mini']
     min_mz = args['minmz']
     max_mz = args['maxmz']
+    scan_low = args['scan_low']
+    scan_high = args['scan_high']
 
     skipped = 0
     data_for_analyse = []
@@ -410,6 +414,12 @@ def process_mzml(args):
 
     for z in MS1OnlyMzML(source=input_mzml_path):
         if z['ms level'] == 1:
+
+            if scan_high and scan_low and not (
+                (z["scanList"]["scan"][0]["scanWindowList"]['scanWindow'][0]['scan window upper limit'] == scan_high) & 
+                (z["scanList"]["scan"][0]["scanWindowList"]['scanWindow'][0]['scan window lower limit'] == scan_low)
+            ):
+                continue
 
             if 'raw ion mobility array' in z:
                 z['mean inverse reduced ion mobility array'] = z['raw ion mobility array']

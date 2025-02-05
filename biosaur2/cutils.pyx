@@ -11,6 +11,10 @@ np.import_array()
 cdef dict charge_ban_map
 
 charge_ban_map = {
+    12: (1, 2, 3, 4, 6, ),
+    11: (1, ),
+    10: (1, 2, 5, ),
+    9: (1, 3, ),
     8: (1, 2, 4, ),
     7: (1, ),
     6: (1, 2, 3, ),
