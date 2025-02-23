@@ -414,7 +414,6 @@ def process_mzml(args):
 
     for z in MS1OnlyMzML(source=input_mzml_path):
         if z['ms level'] == 1:
-
             if scan_high and scan_low and not (
                 (z["scanList"]["scan"][0]["scanWindowList"]['scanWindow'][0]['scan window upper limit'] == scan_high) & 
                 (z["scanList"]["scan"][0]["scanWindowList"]['scanWindow'][0]['scan window lower limit'] == scan_low)
@@ -463,7 +462,7 @@ def process_mzml(args):
     logger.info('Number of skipped MS1 scans: %d', skipped)
 
     if len(data_for_analyse) == 0:
-        raise Exception('no MS1 scans in input file')
+        logger.info('No MS1 scans in input file in scan_range!')
 
     return data_for_analyse
 
